@@ -429,6 +429,14 @@ FILE* fileopen( const char* path, const char* mode ) {
         fp = nullptr;
 	}
 #else
+    /* fopen函数说明：
+     * 原型：FILE * fopen ( const char * filename, const char * mode );
+     * mode参数有：
+     * "r"	read: 为输入操作打开文件，文件必须存在。
+     * "w"	write: 为输出操作创建一个空文件，如果文件已存在，则将已有文件内容舍弃，按照空文件对待。
+     * "a"	append: 为输出打开文件，输出操作总是再文件末尾追加数据，如果文件不存在，创建新文件。
+     * 如果要以二进制形式打开，需要在模式中加上“b”
+     */
 	fp = fopen( path, mode );
 #endif	// MSC_VER
 

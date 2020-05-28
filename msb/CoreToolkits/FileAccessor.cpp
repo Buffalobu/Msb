@@ -54,7 +54,7 @@ int FileAccessor::write( void* addr, int size ) {
 // read data
 int FileAccessor::read( void* addr, int size ) {
 	// check parameters
-	if( addr == NULL || size == 0 || m_fp == NULL ) {
+    if( addr == nullptr || size == 0 || m_fp == nullptr ) {
 		return 0;
 	}
 

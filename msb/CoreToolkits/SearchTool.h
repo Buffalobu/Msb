@@ -13,7 +13,7 @@
 #define __KOME_CORE_SEARCH_TOOL_H__
 
 
-//#include <boost/function.hpp>
+#include <boost/function.hpp>
 
 
 namespace kome {
@@ -47,10 +47,10 @@ namespace kome {
 			template< typename S, typename T >
 			static int binarySearch(
 					S value,
-//					boost::function< T ( int ) > getElementFun,
-//					boost::function< int ( T, S ) > compareFun,
-                    T ( *getElementFun ) ( int ),
-                    int ( *compareFun ) ( T, S ),
+                    boost::function< T ( int ) > getElementFun,
+                    boost::function< int ( T, S ) > compareFun,
+//                    T ( *getElementFun ) ( int ),
+//                    int ( *compareFun ) ( T, S ),
 					int size
 			) {
 				// range of search

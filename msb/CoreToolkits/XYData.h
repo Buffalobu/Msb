@@ -22,8 +22,9 @@
 #include <list>
 #include <string>
 
-//#include <boost/function.hpp>
-//#include <boost/optional.hpp>
+#include <boost/function.hpp>
+#include <boost/optional.hpp>
+#include <boost/bind.hpp>
 
 //#include "../CoreFunctions/CoreMacros.h" //ly
 //#include "../CoreFunctions/StringFunctions.h" //ly
@@ -232,15 +233,16 @@ namespace kome {
 			 * @brief imports data
 			 * @param[in] readFun read function
 			 */
-//			bool importData( boost::function< int ( void*, int ) > readFun );
-            bool importData( int (*readFun)( void*, int ));
+            bool importData( boost::function< int ( void*, int ) > readFun );
+//            bool importData( int (*readFun)( void*, int ));
 
 			/**
 			 * @fn bool exportData( boost::function< int ( void*, int ) > writeFun )
 			 * @brief exports data
 			 * @param[in] writeFun write function
 			 */
-            bool exportData(int(*writeFun)(void *, int) );
+            bool exportData( boost::function< int ( void*, int ) > writeFun );
+//            bool exportData(int(*writeFun)(void *, int) );
 
 		protected:
 			/**
@@ -256,7 +258,8 @@ namespace kome {
 			 * @param[in] readFun read function
 			 * @return If true, it succeeded to load the data.
 			 */
-            virtual bool onLoadData( int(*readFun) ( void*, int ));
+            virtual bool onLoadData( boost::function< int ( void*, int ) > readFun );
+//            virtual bool onLoadData( int(*readFun) ( void*, int ));
 
 			/**
 			 * @fn virtual bool onSaveData( boost::function< int ( void*, int ) > writeFun )
@@ -264,7 +267,8 @@ namespace kome {
 			 * @param[in] writeFun write function
 			 * @return If true, it succeeded to save the data
 			 */
-            virtual bool onSaveData( int(*writeFun) ( void*, int ));
+            virtual bool onSaveData( boost::function< int ( void*, int ) > writeFun );
+//            virtual bool onSaveData( int(*writeFun) ( void*, int ));
 
 		protected:
 			/**

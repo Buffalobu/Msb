@@ -300,22 +300,14 @@ int XYData::searchIndex( const double x ) {
 		}
 	};
 
-//    static int binarySearch(
-//            S value,
-//            T ( *getElementFun ) ( int ),
-//            int ( *compareFun ) ( T, S ),
-//            int size
-//    ) {
-
 	// search
 	int idx = -1;
-//	idx = SearchTool::binarySearch< double, double >(
-//		x,
-// //		boost::bind( SearchHelper::getX, _1, this ),
-//        SearchHelper::getX,
-//		SearchHelper::compare,
-//		getLength()
-//	);
+    idx = SearchTool::binarySearch< double, double >(
+        x,
+        boost::bind( SearchHelper::getX, _1, this ),
+        SearchHelper::compare,
+        getLength()
+    );
 
 	return idx;
 }
@@ -411,7 +403,8 @@ void XYData::getPoints( std::vector< Point< double > >& points, const bool ySort
 }
 
 // import data
-bool XYData::importData(int (*readFun)(void *, int) ) {
+bool XYData::importData( boost::function< int ( void*, int ) > readFun ){
+//bool XYData::importData(int (*readFun)(void *, int) ) {
 	// clear
 	onClearPoints();
 
@@ -422,7 +415,8 @@ bool XYData::importData(int (*readFun)(void *, int) ) {
 }
 
 // export data
-bool XYData::exportData( int(*writeFun) ( void*, int ) ) {
+bool XYData::exportData( boost::function< int ( void*, int ) > writeFun ){
+//bool XYData::exportData( int(*writeFun) ( void*, int ) ) {
 	// update range
 	updateRange();
 
@@ -489,7 +483,8 @@ void XYData::updateRange() {
 }
 
 // on load data
-bool XYData::onLoadData( int (*readFun)( void*, int )) {
+bool XYData::onLoadData( boost::function< int ( void*, int ) > readFun ){
+//bool XYData::onLoadData( int (*readFun)( void*, int )) {
 	// length
 	unsigned long len = 0;
 	readFun( &len, sizeof( len ) );
@@ -511,7 +506,8 @@ bool XYData::onLoadData( int (*readFun)( void*, int )) {
 }
 
 // on save data
-bool XYData::onSaveData(int(*writeFun)(void *, int) ) {
+bool XYData::onSaveData( boost::function< int ( void*, int ) > writeFun ){
+//bool XYData::onSaveData(int(*writeFun)(void *, int) ) {
 	// length
 	unsigned long len = onGetLength();
 	writeFun( &len, sizeof( len ) );
@@ -551,7 +547,7 @@ void XYData::releaseData() {
 
 	// create data
 	Buffer buffer;
-//	exportData( boost::bind( &DataAccessor::write, &buffer, _1, _2 ) );
+    exportData( boost::bind( &DataAccessor::write, &buffer, _1, _2 ) );
 
 
 	static int tmpDirCnt = 0;
@@ -575,7 +571,7 @@ void XYData::releaseData() {
     FILE* fp = fopen( path.c_str(), "wb" );
 
 	FileAccessor acc( fp );
-//	exportData( boost::bind( &DataAccessor::write, &acc, _1, _2 ) );
+    exportData( boost::bind( &DataAccessor::write, &acc, _1, _2 ) );
 
 	fflush( fp );
 	fclose( fp );
@@ -664,7 +660,7 @@ void XYData::recoverData() {
 
 		// import
 		FileAccessor acc( fp );
-//		importData( boost::bind( &DataAccessor::read, &acc, _1, _2 ) );
+        importData( boost::bind( &DataAccessor::read, &acc, _1, _2 ) );
 
 		fclose( fp );
 	}

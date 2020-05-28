@@ -1322,13 +1322,17 @@ int MsbIO0202::writeSpectrumData(
 	unsigned long long xPos = filetell( m_fp );
 	size_t stReturnValue = fwrite( points.getXData(), sizeof( float ), length, m_fp );	// @date 2013/06/27 <Mod> OKADA
 	if( stReturnValue != length ){							// @date 2013/06/27 <Add> OKADA
-		LOG_ERROR( FMT( "[1]Writing MSB file error in writeSpectrumData(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) );	// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "[1]Writing MSB file error in writeSpectrumData(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) )	// @date 2013/06/27 <Add> OKADA
 	}														// @date 2013/06/27 <Add> OKADA
 
 	unsigned long long yPos = filetell( m_fp );
 	stReturnValue = fwrite( points.getYData(), sizeof( float ), length, m_fp );// @date 2013/06/27 <Mod> OKADA
 	if( stReturnValue != length ){							// @date 2013/06/27 <Add> OKADA
-		LOG_ERROR( FMT( "[2]Writing MSB file error in writeSpectrumData(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) );	// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "[2]Writing MSB file error in writeSpectrumData(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) )	// @date 2013/06/27 <Add> OKADA
 	}														// @date 2013/06/27 <Add> OKADA
 
 	// add parts
@@ -1390,13 +1394,13 @@ int MsbIO0202::writeSpectrumData(
 
 		// set data
 		m_partInfo[ 0 ].val.ul = part.spectrum;		  // Spectrum ID
-		m_partInfo[ 1 ].val.ul = part.length;			// Data Length
-		m_partInfo[ 2 ].val.f  = part.start;			 // Start m/z
-		m_partInfo[ 3 ].val.f  = part.end;			   // End m/z
-		m_partInfo[ 4 ].val.f  = part.totalIntensity;	// Total Intensity
+        m_partInfo[ 1 ].val.ul = part.length;		  // Data Length
+        m_partInfo[ 2 ].val.f  = part.start;		  // Start m/z
+        m_partInfo[ 3 ].val.f  = part.end;			  // End m/z
+        m_partInfo[ 4 ].val.f  = part.totalIntensity; // Total Intensity
 		m_partInfo[ 5 ].val.f  = part.minIntensity;	  // Min Intensity
 		m_partInfo[ 6 ].val.f  = part.maxIntensity;	  // Max Intensity
-		m_partInfo[ 7 ].val.ul = part.msAlign;		   // m/z Data Align
+        m_partInfo[ 7 ].val.ul = part.msAlign;		  // m/z Data Align
 		m_partInfo[ 8 ].val.ul = part.intAlign;		  // Intensity Data Align
 
 		// write to header
@@ -1420,7 +1424,9 @@ int MsbIO0202::writeSpectrumData(
 		}
 
 		if( s != writeSize ){							// @date 2013/06/27 <Add> OKADA
-			LOG_ERROR( FMT( "[3]Writing MSB file error in writeSpectrumData(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) );	// @date 2013/06/27 <Add> OKADA
+            LOG_ERROR( FMT( "[3]Writing MSB file error in writeSpectrumData(). "
+                            "Return value and item size of fwrite() disagree. "
+                            "Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) )	// @date 2013/06/27 <Add> OKADA
 		}														// @date 2013/06/27 <Add> OKADA
 
 
@@ -1520,8 +1526,8 @@ void MsbIO0202::writeSpectrumParts( const int cnt, FILE* partsFp ) {
 
 	// header
 	m_dataHeader[ 0 ].val.ul = GET_DATA_SIZE( m_dataHeader );	// header size
-	m_dataHeader[ 1 ].val.ul = dataSize;						 // spectrum part size
-	m_dataHeader[ 2 ].val.ul = std::max( 0, cnt );			   // number of spectrum parts
+    m_dataHeader[ 1 ].val.ul = dataSize;						// spectrum part size
+    m_dataHeader[ 2 ].val.ul = std::max( 0, cnt );			    // number of spectrum parts
 
 	// write header
 	WRITE_TO_FILE( m_dataHeader );
@@ -1535,7 +1541,9 @@ void MsbIO0202::writeSpectrumParts( const int cnt, FILE* partsFp ) {
 	while( ( readSize = fread( buff, 1, 1024, partsFp ) ) > 0 ) {
 		size_t stReturnValue = fwrite( buff, 1, readSize, m_fp );// @date 2013/06/27 <Mod> OKADA
 		if( stReturnValue != readSize ){						// @date 2013/06/27 <Add> OKADA
-			LOG_ERROR( FMT( "Writing MSB file error in writeSpectrumParts(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, readSize, errno ) );	// @date 2013/06/27 <Add> OKADA
+            LOG_ERROR( FMT( "Writing MSB file error in writeSpectrumParts(). "
+                            "Return value and item size of fwrite() disagree. "
+                            "Return value=%d, Item size=%d. errno=%d", stReturnValue, readSize, errno ) )	// @date 2013/06/27 <Add> OKADA
 		}														// @date 2013/06/27 <Add> OKADA
 
 	}
@@ -1599,8 +1607,8 @@ void MsbIO0202::writeSpectrumProperties(
 		Prop& prop = properties[ i ];
 
 		// set data
-		m_prop[ 0 ].val.ul = prop.id;	   // Spectrum ID
-		m_prop[ 1 ].val.ms = prop.key;	  // Property Key
+        m_prop[ 0 ].val.ul = prop.id;	    // Spectrum ID
+        m_prop[ 1 ].val.ms = prop.key;	    // Property Key
 		m_prop[ 2 ].val.ms = prop.value;	// Property Value
 
 		// write to header
@@ -1611,7 +1619,9 @@ void MsbIO0202::writeSpectrumProperties(
 	// write to file
 	size_t stReturnValue = fwrite( buff, 1, size, m_fp );	// @date 2013/06/27 <Mod> OKADA
 	if( stReturnValue != size ){							// @date 2013/06/27 <Add> OKADA
-		LOG_ERROR( FMT( "Writing MSB file error in writeSpectrumProperties(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) );	// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "Writing MSB file error in writeSpectrumProperties(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) )	// @date 2013/06/27 <Add> OKADA
 	}														// @date 2013/06/27 <Add> OKADA
 
 	// delete buffer
@@ -1934,12 +1944,12 @@ bool MsbIO0202::onWriteMsb(
 		return true;
 	}
 
-    m_fileHeader[ 17 ].val.ull = filetell( m_fp );           // 17: Spectrum Data Align
+    m_fileHeader[ 17 ].val.ull = filetell( m_fp );                  // 17: Spectrum Data Align
 
 	kome::core::MsppManager& msppMgr = kome::core::MsppManager::getInstance();
 	std::string fileName = msppMgr.getTmpFileName( "mspp_spec_parts", ".tmp" );
 	std::string partsPath = getpath( msppMgr.getTmpDir(), fileName.c_str() );
-	FILE* partsFp = fileopen( partsPath.c_str(), "wb" );
+    FILE* partsFp = fileopen( partsPath.c_str(), "wb" ); //以二进制形式打开，write模式。
 
 	int partsCnt = 0;
 
@@ -1975,7 +1985,7 @@ bool MsbIO0202::onWriteMsb(
 			}
 		}
 
-		// write spectrum data
+        // write spectrum data to partsFp
 		partsCnt += writeSpectrumData( id, *spectrum, points, partsFp );
 		progress.setPosition( ++pos );	// pos == 7 + chromatograms + spectra
 
@@ -1991,21 +2001,21 @@ bool MsbIO0202::onWriteMsb(
 	if( progress.isStopped() ) {
 		return true;
 	}
-    m_fileHeader[ 18 ].val.ull = filetell( m_fp );					  // 18:Spectrum Align
+    m_fileHeader[ 18 ].val.ull = filetell( m_fp );					  // 18: Spectrum Align
 	progress.setStatus( "Writing spectrum information." );
 
-	writeSpectra( dataSet, spectrumMap, groupMap );
+    writeSpectra( dataSet, spectrumMap, groupMap ); //write m_spectrumInfo to m_fp.
 	progress.setPosition( ++pos );	// pos == 8 + chromatograms + spectra
 
 	// spectrum part
 	if( progress.isStopped() ) {
 		return true;
 	}
-	m_fileHeader[ 19 ].val.ull = filetell( m_fp );					  // Spectrum Part Align
+    m_fileHeader[ 19 ].val.ull = filetell( m_fp );					  // 19: Spectrum Part Align
 	progress.setStatus( "Writing spectrum parts." );
 
-	partsFp = fileopen( partsPath.c_str(), "rb" );
-	writeSpectrumParts( partsCnt, partsFp );
+    partsFp = fileopen( partsPath.c_str(), "rb" );//以二进制形式打开，read模式。
+    writeSpectrumParts( partsCnt, partsFp ); //move data from partsFp to m_fp. LY
 	fclose( partsFp );
 	progress.setPosition( ++pos );	// pos == 9 + chromatograms + spectra
 
