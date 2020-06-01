@@ -49,6 +49,14 @@ void MainWindow::on_UI_PB_ReadMSB_clicked()
 //转换
 void MainWindow::on_UI_PB_Convert_clicked()
 {
+    // return value
+    kome::objects::Variant ret;
+    ret.type = kome::objects::Variant::BOOL;
+    kome::io::msb::MsbIO0202 msb0202;
+    std::string path = "G:\\QT\\qt_msb_test\\testMsb.msb";
+    ret.prim.boolVal = msb0202.SimplifyWriteMsb(path.c_str());
+    return;
+
     //读硅油文件
 
 
@@ -84,13 +92,13 @@ kome::objects::Variant MainWindow::make_params(kome::objects::Parameters &params
     kome::io::msb::MsbSampleSet* msbSampleSet = new kome::io::msb::MsbSampleSet();
     //raw data file.
     std::string sourceFilePath = "";//this should be absolute path. cuz "absolutepath" function is invalid.
-//    msbSampleSet->setSourceFilePath(sourceFilePath.c_str());
+    msbSampleSet->setSourceFilePath(sourceFilePath.c_str());
     msbSampleSet->openFile(sourceFilePath.c_str());
 
     kome::io::msb::MsbSample* msbSample = new kome::io::msb::MsbSample(msbSampleSet);
     std::string name = "";
-    FILE m_File;
-    kome::io::msb::MsbSpectrum* msbSpec = new kome::io::msb::MsbSpectrum(msbSample, name.c_str(), &m_File);    
+    FILE* m_File = fopen("", "rb");
+    kome::io::msb::MsbSpectrum* msbSpec = new kome::io::msb::MsbSpectrum(msbSample, name.c_str(), m_File);
     dataSet->addSpectrum(msbSpec);
     //sets dataSet to params
     if( dataSet == nullptr ) {
@@ -154,7 +162,6 @@ void MainWindow::on_UI_PB_LOAD_clicked()
              cParamValue::_Segment* pSegmentLIT=nullptr;
              splitStreamHead(pStreamHead, pSegmentLIT);
              dataDismantleFirst(mGraphBuffer, pSegmentLIT, &(tmpThreadBuffX), &(tmpThreadBuffY), listSTRUCT_DATA, isRestart = false);
-
          }
    }
 }

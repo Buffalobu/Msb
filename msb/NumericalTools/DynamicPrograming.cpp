@@ -55,12 +55,14 @@ DynamicPrograming::~DynamicPrograming() {
 }
 
 // set the function to get row title
-void DynamicPrograming::setRowTitleFunction( std::string (*rowTitleFun)( int )) {
+void DynamicPrograming::setRowTitleFunction( boost::function< std::string ( int ) > rowTitleFun ){
+//void DynamicPrograming::setRowTitleFunction( std::string (*rowTitleFun)( int )) {
 	m_rowTitleFun = rowTitleFun;
 }
 
 // set the function to get column title
-void DynamicPrograming::setColTitleFunction( std::string(*colTitleFun)( int )) {
+void DynamicPrograming::setColTitleFunction( boost::function< std::string ( int ) > colTitleFun ){
+//void DynamicPrograming::setColTitleFunction( std::string(*colTitleFun)( int )) {
 	m_colTitleFun = colTitleFun;
 }
 
@@ -225,7 +227,8 @@ bool DynamicPrograming::isValid( const int row, const int col ) {
 
 // calculate
 bool DynamicPrograming::calculate(
-        double(*scoreFun)( int, int ) ,
+        boost::function< double( int, int ) > scoreFun,
+//        double(*scoreFun)( int, int ) ,
 		const double gapPenalty,
 		const double invalidScore,
 		kome::core::Progress* progress
@@ -334,7 +337,8 @@ bool DynamicPrograming::calculate(
 }
 
 // traceback
-void DynamicPrograming::traceback( void(*pushFun)( int, int )) {
+void DynamicPrograming::traceback( boost::function< void ( int, int ) > pushFun ){
+//void DynamicPrograming::traceback( void(*pushFun)( int, int )) {
 	// traceback
 	int row = m_row - 1;
 	int col = m_col - 1;

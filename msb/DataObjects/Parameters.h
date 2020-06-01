@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <map>
-//#include <boost/function.hpp>
+#include <boost/function.hpp>
 
 namespace kome {
 	namespace objects {
@@ -80,8 +80,8 @@ namespace kome {
 }
 
 // type definition
-//typedef boost::function< kome::objects::Variant ( kome::objects::Parameters* ) > PLUGIN_FUNCTION;
+typedef boost::function< kome::objects::Variant ( kome::objects::Parameters* ) > PLUGIN_FUNCTION;
 
-typedef kome::objects::Variant (*PLUGIN_FUNCTION) (kome::objects::Parameters*);
+//typedef kome::objects::Variant (*PLUGIN_FUNCTION) (kome::objects::Parameters*);
 
 #endif	// __KOME_OBJECTS_PARAMETERS_H__

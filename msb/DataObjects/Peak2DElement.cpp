@@ -16,7 +16,7 @@
 #include "PeaksCluster2D.h"
 #include "PeakElement.h"
 
-//#include <boost/bind.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace kome::objects;

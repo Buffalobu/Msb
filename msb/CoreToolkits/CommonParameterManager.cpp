@@ -14,8 +14,8 @@
 #include "IniFile.h"
 
 #include <iostream>
-//#include <boost/regex.hpp>
-//#include <boost/algorithm/string/case_conv.hpp>
+#include <boost/regex.hpp>
+#include <boost/algorithm/string/case_conv.hpp>
 
 #include <regex>
 
@@ -48,7 +48,7 @@ int CommonParameterManager::getNumberOfParameters(){
 // get parameter name
 std::string CommonParameterManager::getParameterName( unsigned int index ){	
 	if( index >= m_paramInfo.size() ) {
-		return NULL;
+        return nullptr;
 	}
 
 	return m_paramInfo[ index ].paramName;
@@ -81,19 +81,19 @@ void CommonParameterManager::setIniString( std::string strKey, std::string strVa
 	kome::core::IniFile* ini = msppMgr.getIniFile();
 		
 	const char* strRegex = "([^0-9a-zA-Z])";
-//	boost::regex  reg_exp(strRegex);
-    std::regex reg_exp(strRegex);
+    boost::regex  reg_exp(strRegex);
+//    std::regex reg_exp(strRegex);
 		
 	std::string replace = "_";
 	std::string result = "";
 
 	// replace
-//	result =  boost::regex_replace( strKey, reg_exp, replace, boost::format_all );
-    result = std::regex_replace( strKey, reg_exp, replace, std::regex_constants::match_any );
+    result =  boost::regex_replace( strKey, reg_exp, replace, boost::format_all );
+//    result = std::regex_replace( strKey, reg_exp, replace, std::regex_constants::match_any );
 	// Converted to uppercase.
-//	boost::algorithm::to_upper(result);
-    for(int i = 0; i < result.length(); i++)
-        result[i] = toupper(result[i]);
+    boost::algorithm::to_upper(result);
+//    for(int i = 0; i < result.length(); i++)
+//        result[i] = toupper(result[i]);
 
 	// set string 
 	ini->setString( SECTION, result.c_str(), strValue.c_str() );

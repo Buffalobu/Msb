@@ -302,12 +302,13 @@ HEADERS += \
     msb/PluginTools/stdafx.h \
     msb/SpectrumPart.h \
     msb/SpectrumPartArray.h \
+    msb/stdafx.h
 #    msb/XMLTools/XMLTools.h \
 #    msb/XMLTools/XercesTool.h \
 #    msb/XMLTools/Xml.h \
 #    msb/XMLTools/XmlHandler.h \
 #    msb/XMLTools/stdafx.h \
-    msb/stdafx.h
+
 
 FORMS += \
     mainwindow.ui
@@ -332,6 +333,12 @@ DISTFILES += \
     msb/PluginTools/settings.xsd \
     msb/XMLTools/Makefile.in
 
+LIBS += \
+    -LC:\Qt\Qt5.12.5\5.12.5\mingw73_32\lib/  \
+    -llibboost_filesystem-mgw73-mt-d-x32-1_66 \
+    -llibboost_system-mgw73-mt-d-x32-1_66 \
+    -llibboost_regex-mgw73-mt-d-x32-1_66
+#    -l
 
 #win32:!win32-g++: PRE_TARGETDEPS += $$PWD/./zlib.lib
 #else:win32-g++: PRE_TARGETDEPS += $$PWD/./libzlib.a

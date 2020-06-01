@@ -242,7 +242,7 @@ std::string NumberRestriction::getRangeStr( const char* name ) {
 
 	// variables
 //	boost::optional< double > v;
-    double v;
+    double v = 0.0;
 	bool inclusive = false;
 
 	// get min value

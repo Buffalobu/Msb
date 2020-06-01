@@ -13,7 +13,7 @@
 #include "Properties.h"
 
 #include <list>
-//#include <boost/bind.hpp>
+#include <boost/bind.hpp>
 #include<string.h>
 
 using namespace kome::core;

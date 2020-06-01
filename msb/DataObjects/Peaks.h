@@ -200,8 +200,8 @@ namespace kome {
 			 * @param[in] readFun read function
 			 * @return If true, it succeeded to load the data.
 			 */
-//			virtual bool onLoadData( boost::function< int ( void*, int ) > readFun );
-            virtual bool onLoadData( int(*readFun) ( void*, int ));
+            virtual bool onLoadData( boost::function< int ( void*, int ) > readFun );
+//            virtual bool onLoadData( int(*readFun) ( void*, int ));
 
 			/**
 			 * @fn virtual bool onSaveData( boost::function< int ( void*, int ) > writeFun )
@@ -209,8 +209,8 @@ namespace kome {
 			 * @param[in] writeFun write function
 			 * @return If true, it succeeded to save the data
 			 */
-//			virtual bool onSaveData( boost::function< int ( void*, int ) > writeFun );
-            virtual bool onSaveData(int(*writeFun) ( void*, int ));
+            virtual bool onSaveData( boost::function< int ( void*, int ) > writeFun );
+//            virtual bool onSaveData(int(*writeFun) ( void*, int ));
 			
 		protected:
 			/**

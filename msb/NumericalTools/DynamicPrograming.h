@@ -13,7 +13,7 @@
 #define __KOME_NUMERIC_DYNAMIC_PROGRAMING_H__
 
 
-//#include <boost/function.hpp>
+#include <boost/function.hpp>
 
 #include "stdafx.h"
 
@@ -74,12 +74,12 @@ namespace kome {
 
 		protected:
 			/** the function to get row title */
-//			boost::function< std::string ( int ) > m_rowTitleFun;
-            std::string (*m_rowTitleFun) ( int );
+            boost::function< std::string ( int ) > m_rowTitleFun;
+//            std::string (*m_rowTitleFun) ( int );
 
 			/** the function to get column title */
-//			boost::function< std::string ( int ) > m_colTitleFun;
-            std::string (*m_colTitleFun) ( int );
+            boost::function< std::string ( int ) > m_colTitleFun;
+//            std::string (*m_colTitleFun) ( int );
 
 		public:
 			/**
@@ -124,8 +124,8 @@ namespace kome {
 			 * @return If true, it succeeded to calculate.
 			 */
 			bool calculate(
-//				boost::function< double( int, int ) > scoreFun,
-                double(*scoreFun)( int, int ),
+                boost::function< double( int, int ) > scoreFun,
+//                double(*scoreFun)( int, int ),
 				const double gapPenalty,
 				const double invalidScore = -1000.0,
                 kome::core::Progress* progress = nullptr
@@ -136,8 +136,8 @@ namespace kome {
 			 * @brief traceback result
 			 * @param[in] pushFun the function to store result
 			 */
-//			void traceback( boost::function< void ( int, int ) > pushFun );
-            void traceback( void(*pushFun) ( int, int ));
+            void traceback( boost::function< void ( int, int ) > pushFun );
+//            void traceback( void(*pushFun) ( int, int ));
 
 		public:
 			/**
@@ -145,16 +145,16 @@ namespace kome {
 			 * @brief sets the function to get row title
 			 * @param[in] rowTitleFun the function to get row title
 			 */
-//			void setRowTitleFunction( boost::function< std::string ( int ) > rowTitleFun );
-            void setRowTitleFunction( std::string(*rowTitleFun) ( int ));
+            void setRowTitleFunction( boost::function< std::string ( int ) > rowTitleFun );
+//            void setRowTitleFunction( std::string(*rowTitleFun) ( int ));
 
 			/**
 			 * @fn void setColTitleFunction( boost::function< std::string ( int ) > colTitleFun )
 			 * @brief sets the function to get column title
 			 * @param[in] colTitleFun the function to get column title
 			 */
-//			void setColTitleFunction( boost::function< std::string ( int ) > colTitleFun );
-            void setColTitleFunction( std::string (*colTitleFun) ( int ) );
+            void setColTitleFunction( boost::function< std::string ( int ) > colTitleFun );
+//            void setColTitleFunction( std::string (*colTitleFun) ( int ) );
 
 		protected:
 			/**

@@ -8,7 +8,7 @@
  * Copyright(C) 2006-2014 Eisai Co., Ltd. All rights reserved.
  */
 
-#if 0
+#if 1
 
 #include "stdafx.h"
 #include "PluginManager.h"
@@ -512,88 +512,88 @@ unsigned int PluginManager::issueMenuId() {
 // get link
 void* PluginManager::getLink( const char* path ) {
 // LY LY LY
-//	// create path string
-//	std::string p = absolutepath( path );
+    // create path string
+    std::string p = absolutepath( path );
 
-//	// check map
-//	if( m_handleMap.find( p ) == m_handleMap.end() ) {
-//        return nullptr;
-//	}
+    // check map
+    if( m_handleMap.find( p ) == m_handleMap.end() ) {
+        return nullptr;
+    }
 
-//	return m_handleMap[ p ];
-//}
+    return m_handleMap[ p ];
+}
 
-//// open dynamic link library
-//void* PluginManager::openLink( const char* path ) {
-//	// get handle
-//	std::string p = absolutepath( path );
-//	DL_HANDLE handle = (DL_HANDLE)getLink( p.c_str() );
+// open dynamic link library
+void* PluginManager::openLink( const char* path ) {
+    // get handle
+//    std::string p = absolutepath( path );
+//    DL_HANDLE handle = (DL_HANDLE)getLink( p.c_str() );
 //    if( handle != nullptr ) {
-//		LOG_TRACE( FMT( "The link is already opened. [%s]", p.c_str() ) );
-//		return handle;
-//	}
+//        LOG_TRACE( FMT( "The link is already opened. [%s]", p.c_str() ) );
+//        return handle;
+//    }
 
-//	// check file path
-//	if( !checkfile( p.c_str() ) ) {
-//		LOG_ERROR( FMT( "Specified path is illegal. [%s]", p.c_str() ) );
+//    // check file path
+//    if( !checkfile( p.c_str() ) ) {
+//        LOG_ERROR( FMT( "Specified path is illegal. [%s]", p.c_str() ) );
 //        return nullptr;
-//	}
+//    }
 
-//	// open
-//	LOG_INFO( FMT( "Loading library. [%s]", p.c_str() ) );
+//    // open
+//    LOG_INFO( FMT( "Loading library. [%s]", p.c_str() ) );
 
 //#ifdef _WIN32
 //    handle = LoadLibraryEx( p.c_str(), nullptr, LOAD_WITH_ALTERED_SEARCH_PATH );
 //#else
-//	handle = dlopen( p.c_str(), RTLD_LAZY );
+//    handle = dlopen( p.c_str(), RTLD_LAZY );
 //#endif	// _WIN32
 
 //    if( handle == nullptr ) {
 //#ifdef _WIN32
-//		// error code
-//		int err = GetLastError();
+//        // error code
+//        int err = GetLastError();
 
-//		// error message
-//		LPVOID errBuf;
-//		FormatMessage(
-//			FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+//        // error message
+//        LPVOID errBuf;
+//        FormatMessage(
+//            FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
 //            nullptr,
-//			err,
-//			MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
-//			(char*)( &errBuf ),
-//			0,
+//            err,
+//            MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+//            (char*)( &errBuf ),
+//            0,
 //            nullptr
-//		);
+//        );
 
-//		// log
-//		LOG_ERROR(
-//			FMT(
-//				"Failed to load the library. [%s]  Error(code=%x): %s",
-//				p.c_str(),
-//				err,
-//				errBuf
-//			)
-//		);
+//        // log
+//        LOG_ERROR(
+//            FMT(
+//                "Failed to load the library. [%s]  Error(code=%x): %s",
+//                p.c_str(),
+//                err,
+//                errBuf
+//            )
+//        )
 
-//		// free buffer
-//		LocalFree( errBuf );
+//        // free buffer
+//        LocalFree( errBuf );
 //#else
-//		LOG_ERROR(
-//			FMT(
-//				"Failed to load the library. [%s] (%s)",
-//				p.c_str(),
-//				dlerror()
-//			)
-//		);
+//        LOG_ERROR(
+//            FMT(
+//                "Failed to load the library. [%s] (%s)",
+//                p.c_str(),
+//                dlerror()
+//            )
+//        );
 //#endif	//_WIN32
 
 //        return nullptr;
-//	}
+//    }
 
-//	// set to map
-//	m_handleMap[ p ] = handle;
+//    // set to map
+//    m_handleMap[ p ] = handle;
 
-//	return handle;
+//    return handle;
 }
 
 // close dynamic link library

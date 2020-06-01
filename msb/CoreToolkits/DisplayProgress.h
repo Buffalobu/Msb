@@ -8,7 +8,7 @@
  * Copyright(C) 2006-2014 Eisai Co., Ltd. All rights reserved.
  */
 
-#if 0
+#if 1
 
 #ifndef __KOME_CORE_DISPLAY_PROGRESS_H__
 #define __KOME_CORE_DISPLAY_PROGRESS_H__

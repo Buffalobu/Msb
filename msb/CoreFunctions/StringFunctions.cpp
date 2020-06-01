@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <set>
 #include <list>
-//#include <boost/regex.hpp>
+#include <boost/regex.hpp>
 
 #include <regex>
 
@@ -605,22 +605,22 @@ std::string shortenstring( const char* s, const unsigned int len, const bool cut
 
 // regex search
 std::string regexsearch( const char* s, const char* regex ) {
-//	// return value
-//	std::string ret;
+    // return value
+    std::string ret;
 
-//	boost::regex r( regex );
-//	boost::match_results< const char* > results;
-//	if( boost::regex_search( s, results, r ) ) {
-//		ret = results.str( 1 );
-//	}
-
-//	return ret;
-    std::string str(s);
-    std::smatch m;
-    std::regex r(regex);
-    std::string ret = "";
-    if(std::regex_search(str, m, r)){
-        ret = m.str(1);
+    boost::regex r( regex );
+    boost::match_results< const char* > results;
+    if( boost::regex_search( s, results, r ) ) {
+        ret = results.str( 1 );
     }
+
     return ret;
+//    std::string str(s);
+//    std::smatch m;
+//    std::regex r(regex);
+//    std::string ret = "";
+//    if(std::regex_search(str, m, r)){
+//        ret = m.str(1);
+//    }
+//    return ret;
 }

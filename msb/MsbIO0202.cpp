@@ -1135,7 +1135,9 @@ void MsbIO0202::writeChromatograms(
 	// write to file
 	size_t stReturnValue = fwrite( buff, 1, size, m_fp );	// @date 2013/06/27 <Mod> OKADA
 	if( stReturnValue != size ){							// @date 2013/06/27 <Add> OKADA
-		LOG_ERROR( FMT( "Writing MSB file error in writeChromatograms(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) );	// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "Writing MSB file error in writeChromatograms(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) )	// @date 2013/06/27 <Add> OKADA
 	}														// @date 2013/06/27 <Add> OKADA
 
 	// delete buffer
@@ -1295,6 +1297,148 @@ void MsbIO0202::writeChromatogramUserProperties(
 	// delete buffer
 	delete[] buff;
 }
+#if 1
+// write Simplify spectrum data
+int MsbIO0202::writeSimplifySpectrumData(
+        unsigned int id,
+        kome::core::DataPoints& points,
+        FILE* partsFp
+) {
+    // array
+    unsigned int cnt = 0;
+    std::vector< SpectrumPartInfo > parts;
+
+    // number of points
+    unsigned int length = points.getLength();
+    if( length == 0 ) {
+        return 0;
+    }
+
+    // number of parts
+    SpectrumPartArray arr;
+    getParts( points, arr );
+    unsigned int num = arr.getNumberOfParts();
+
+    // save data
+    unsigned long long xPos = filetell( m_fp );
+    size_t stReturnValue = fwrite( points.getXData(), sizeof( float ), length, m_fp );	// @date 2013/06/27 <Mod> OKADA
+    if( stReturnValue != length ){							// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "[1]Writing MSB file error in writeSpectrumData(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) )	// @date 2013/06/27 <Add> OKADA
+    }														// @date 2013/06/27 <Add> OKADA
+
+    unsigned long long yPos = filetell( m_fp );
+    stReturnValue = fwrite( points.getYData(), sizeof( float ), length, m_fp );// @date 2013/06/27 <Mod> OKADA
+    if( stReturnValue != length ){							// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "[2]Writing MSB file error in writeSpectrumData(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) )	// @date 2013/06/27 <Add> OKADA
+    }														// @date 2013/06/27 <Add> OKADA
+
+    // add parts
+    float maxMz = float();
+    SpectrumPartInfo* lastPart = nullptr;
+    int startIdx = 0;
+    double partRange = (double)m_partRange;
+
+    for( unsigned int i = 0; i < points.getLength(); i++ ) {
+        float x = (float)points.getX( i );
+        float y = (float)points.getY( i );
+
+        if( x > maxMz || lastPart == nullptr ) {		// create new parts
+            int num = roundnum( x / partRange );
+            float mz = (float)num * partRange;
+            maxMz = mz + partRange / 2.0f;
+
+            parts.resize( parts.size() + 1 );
+            lastPart = &parts.back();
+
+            lastPart->spectrum = id;
+            lastPart->length   = 1;
+            lastPart->start = x;
+            lastPart->end = x;
+            lastPart->totalIntensity = y;
+            lastPart->minIntensity = y;
+            lastPart->maxIntensity = y;
+            lastPart->msAlign = xPos + i * sizeof( float );
+            lastPart->intAlign = yPos + i * sizeof( float );
+        }
+        else {
+            float totalIntensity = lastPart->totalIntensity + y;
+            float minIntensity = MIN( lastPart->minIntensity, y );
+            float maxIntensity = MAX( lastPart->maxIntensity, y );
+            unsigned int length = lastPart->length + 1;
+
+            lastPart->end = x;
+            lastPart->totalIntensity = totalIntensity;
+            lastPart->minIntensity = minIntensity;
+            lastPart->maxIntensity = maxIntensity;
+            lastPart->length = length;
+        }
+    }
+
+    // write parts
+    unsigned int dataSize = GET_DATA_SIZE( m_partInfo );
+    unsigned int size = dataSize * parts.size();
+    if( size == 0 ) {
+        return 0;
+    }
+
+    unsigned char* buff = new unsigned char[ size ];
+    unsigned char* pos = buff;
+
+    // write to buffer
+    for( unsigned int i = 0; i < parts.size(); i++ ) {
+        // spectrum
+        SpectrumPartInfo& part = parts[ i ];
+
+        // set data
+        m_partInfo[ 0 ].val.ul = part.spectrum;		  // Spectrum ID
+        m_partInfo[ 1 ].val.ul = part.length;		  // Data Length
+        m_partInfo[ 2 ].val.f  = part.start;		  // Start m/z
+        m_partInfo[ 3 ].val.f  = part.end;			  // End m/z
+        m_partInfo[ 4 ].val.f  = part.totalIntensity; // Total Intensity
+        m_partInfo[ 5 ].val.f  = part.minIntensity;	  // Min Intensity
+        m_partInfo[ 6 ].val.f  = part.maxIntensity;	  // Max Intensity
+        m_partInfo[ 7 ].val.ul = part.msAlign;		  // m/z Data Align
+        m_partInfo[ 8 ].val.ul = part.intAlign;		  // Intensity Data Align
+
+        // write to header
+        WRITE_TO_BUFFER( m_partInfo, pos );
+
+        pos += dataSize;
+    }
+
+    // write to file
+    pos = buff;
+    int rest = (int)size;
+    while( rest > 0 ) {
+        int writeSize = MIN( rest, 0x10000 );
+        int s = fwrite( pos, 1, writeSize, partsFp );
+        if( s == 0 ) {
+            rest = 0;
+        }
+        else {
+            rest -= s;
+            pos += s;
+        }
+
+        if( s != writeSize ){							// @date 2013/06/27 <Add> OKADA
+            LOG_ERROR( FMT( "[3]Writing MSB file error in writeSpectrumData(). "
+                            "Return value and item size of fwrite() disagree. "
+                            "Return value=%d, Item size=%d. errno=%d", stReturnValue, length, errno ) )	// @date 2013/06/27 <Add> OKADA
+        }														// @date 2013/06/27 <Add> OKADA
+
+
+    }
+
+    // delete buffer
+    delete[] buff;
+
+    return (int)parts.size();
+}
+#endif
 
 // write spectrum data
 int MsbIO0202::writeSpectrumData(
@@ -1438,6 +1582,84 @@ int MsbIO0202::writeSpectrumData(
 	return (int)parts.size();
 }
 
+// write Simplify spectra
+void MsbIO0202::writeSimplifySpectra(unsigned int frameCnt) {
+    // spectrum data size
+    unsigned int dataSize = GET_DATA_SIZE( m_spectrumInfo );
+
+    // header
+    m_dataHeader[ 0 ].val.ul = GET_DATA_SIZE( m_dataHeader );	// header size
+    m_dataHeader[ 1 ].val.ul = dataSize;						 // spectrum size
+    m_dataHeader[ 2 ].val.ul = frameCnt;	 // number of spectra
+
+    // write header
+    WRITE_TO_FILE( m_dataHeader );
+    if( frameCnt == 0 ) {
+        return;
+    }
+
+    // buffer
+    unsigned int size = dataSize * frameCnt;
+    unsigned char* buff = new unsigned char[ size ];
+    unsigned char* pos = buff;
+
+    // write to buffer
+    for( unsigned int i = 0; i < frameCnt; i++ ) {
+        // spectrum
+//        kome::objects::Spectrum* spec = dataSet.getSpectrum( i );
+
+        // set data
+        m_spectrumInfo[ 0 ].val.ul = i/*spectrumMap[ spec ]*/;					 // Spectrum ID
+        m_spectrumInfo[ 1 ].val.ms = st( "spec->getName()" );					 // Spectrum Name
+
+        unsigned int parent = 0;
+//        if( spec->getParentSpectrum() != nullptr ) {
+//            parent = spectrumMap[ spec->getParentSpectrum() ];
+//        }
+        m_spectrumInfo[ 2 ].val.ul = parent;									// Parent Spectrum
+
+        m_spectrumInfo[ 3 ].val.ul   = i   /*groupMap[ spec->getGroup() ]*/;	    // Spectrum Group
+        m_spectrumInfo[ 4 ].val.us   = i   /*spec->getMsStage()*/;				// MS Stage
+        m_spectrumInfo[ 5 ].val.f	 = i   /*spec->getPrecursor()*/;				// Precursor
+        m_spectrumInfo[ 6 ].val.f	 = i   /*spec->getStartRt()*/;				// Start Retention Time
+        m_spectrumInfo[ 7 ].val.f	 = i   /*spec->getEndRt()*/;					// End Retention Time
+        m_spectrumInfo[ 8 ].val.f	 = i   /*spec->getMinX()*/;					// min x
+        m_spectrumInfo[ 9 ].val.f	 = i   /*spec->getMaxX()*/;					// max x
+        m_spectrumInfo[ 10 ].val.f   = i   /*spec->getTotalIntensity()*/;		// total intensity
+        m_spectrumInfo[ 11 ].val.f   = i   /*spec->getMaxIntensity()*/;			// max intensity
+        m_spectrumInfo[ 12 ].val.ul  = i   /*spec->getScanNumber()*/;			// Scan Number
+        m_spectrumInfo[ 13 ].val.b   = i   /*spec->isCentroidMode()*/;			// Centroided
+        m_spectrumInfo[ 14 ].val.f   = i   /*spec->getResolution()*/;			// Resolution
+//        if( spec->getPolarity() == kome::objects::Spectrum::POLARITY_NEGATIVE ) {
+//            m_spectrumInfo[ 15 ].val.c = -1;
+//        }
+//        else if( spec->getPolarity() == kome::objects::Spectrum::POLARITY_POSITIVE ) {
+//            m_spectrumInfo[ 15 ].val.c = 1;
+//        }
+//        else {
+            m_spectrumInfo[ 15 ].val.c = 0;
+//        }																	   // Polarity
+        m_spectrumInfo[ 16 ].val.ms =  st( "MS Type" /*spec->getSpecType()*/ );			   // MS Type
+        m_spectrumInfo[ 17 ].val.ms  = st( "spectrum_title" /*spec->getTitle()*/ );				  // Title
+        m_spectrumInfo[ 18 ].val.b   = false/*spec->hasChromatogram()*/;				 // Chromatogram Flag
+        m_spectrumInfo[ 19 ].val.ms  = st( "spec->getIcon()" );				   // Icon Name
+
+        // write to header
+        WRITE_TO_BUFFER( m_spectrumInfo, pos );
+        pos += dataSize;
+    }
+
+    // write to file
+    size_t stReturnValue = fwrite( buff, 1, size, m_fp );	// @date 2013/06/27 <Mod> OKADA
+    if( stReturnValue != size ){							// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "Writing MSB file error in writeSpectra(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) );	// @date 2013/06/27 <Add> OKADA
+    }														// @date 2013/06/27 <Add> OKADA
+
+    // delete buffer
+    delete[] buff;
+}
+
+
 // write spectra
 void MsbIO0202::writeSpectra(
 		kome::objects::DataSet& dataSet,
@@ -1469,7 +1691,7 @@ void MsbIO0202::writeSpectra(
 		kome::objects::Spectrum* spec = dataSet.getSpectrum( i );
 
 		// set data
-		m_spectrumInfo[ 0 ].val.ul = spectrumMap[ spec ];					   // Spectrum ID
+        m_spectrumInfo[ 0 ].val.ul = spectrumMap[ spec ];					 // Spectrum ID
 		m_spectrumInfo[ 1 ].val.ms = st( spec->getName() );					 // Spectrum Name
 
 		int parent = 0;
@@ -1549,10 +1771,88 @@ void MsbIO0202::writeSpectrumParts( const int cnt, FILE* partsFp ) {
 	}
 }
 
+// write Simplify specrum property
+void MsbIO0202::writeSimplifySpectrumProperties(unsigned int frameCnt) {
+    // get properties
+    std::vector< Prop > properties;
+
+    for( unsigned i = 0; i < frameCnt; i++ ) {
+        // spectrum
+//        kome::objects::Spectrum* spec = dataSet.getSpectrum( i );
+        unsigned int id = i /*spectrumMap[ spec ]*/;
+
+        // property
+        kome::core::Properties props /*= spec->getProperties()*/;
+        props.setValue("SimplifySpectrumPropertieskey1", "SimplifySpectrumPropertiesvalue1");
+        props.setValue("SimplifySpectrumPropertieskey2", "SimplifySpectrumPropertiesvalue2");
+
+        // add to array
+        unsigned int idx = properties.size();
+        unsigned int num = props.getNumberOfProperties();
+        if( num > 0 ) {
+            // resize
+            properties.resize( idx + num );
+
+            // set value
+            for( unsigned int j = 0; j < num; j++ ) {
+                Prop& prop = properties[ idx + j ];
+                prop.id = id;
+                prop.key = st( props.getKey( j ) );
+                prop.value = st( props.getValue( j ) );
+            }
+        }
+    }
+
+    // spectrum property data size
+    unsigned int dataSize = GET_DATA_SIZE( m_prop );
+
+    // header
+    m_dataHeader[ 0 ].val.ul = GET_DATA_SIZE( m_dataHeader );	// header size
+    m_dataHeader[ 1 ].val.ul = dataSize;						 // spectrum property size
+    m_dataHeader[ 2 ].val.ul = properties.size();				// number of spectrum properties
+
+    // write header
+    WRITE_TO_FILE( m_dataHeader );
+    if( properties.size() == 0 ) {
+        return;
+    }
+
+    // buffer
+    unsigned int size = dataSize * properties.size();
+    unsigned char* buff = new unsigned char[ size ];
+    unsigned char* pos = buff;
+
+    // write to buffer
+    for( unsigned int i = 0; i < properties.size(); i++ ) {
+        // property
+        Prop& prop = properties[ i ];
+
+        // set data
+        m_prop[ 0 ].val.ul = prop.id;	    // Spectrum ID
+        m_prop[ 1 ].val.ms = prop.key;	    // Property Key
+        m_prop[ 2 ].val.ms = prop.value;	// Property Value
+
+        // write to header
+        WRITE_TO_BUFFER( m_prop, pos );
+        pos += dataSize;
+    }
+
+    // write to file
+    size_t stReturnValue = fwrite( buff, 1, size, m_fp );	// @date 2013/06/27 <Mod> OKADA
+    if( stReturnValue != size ){							// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "Writing MSB file error in writeSpectrumProperties(). "
+                        "Return value and item size of fwrite() disagree. "
+                        "Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) )	// @date 2013/06/27 <Add> OKADA
+    }														// @date 2013/06/27 <Add> OKADA
+
+    // delete buffer
+    delete[] buff;
+}
+
 // write specrum property
 void MsbIO0202::writeSpectrumProperties(
 		kome::objects::DataSet& dataSet,
-		std::map< kome::objects::Spectrum*, unsigned int >& spectrumMap
+        std::map< kome::objects::Spectrum*, unsigned int >& spectrumMap
 ) {
 	// get properties
 	std::vector< Prop > properties;
@@ -1626,6 +1926,82 @@ void MsbIO0202::writeSpectrumProperties(
 
 	// delete buffer
 	delete[] buff;
+}
+
+// write Simplify specrum user property
+void MsbIO0202::writeSimplifySpectrumUserProperties(unsigned int frameCnt){
+    // get properties
+    std::vector< Prop > properties;
+
+    for( unsigned i = 0; i < frameCnt; i++ ) {
+        // spectrum
+//        kome::objects::Spectrum* spec = dataSet.getSpectrum( i );
+        unsigned int id = i/*spectrumMap[ spec ]*/;
+
+        // property
+        kome::core::Properties props /*= spec->getUserProperties()*/;
+        props.setValue("SimplifySpectrumUserPropertieskey1", "SimplifySpectrumUserPropertiesvalue1");
+        props.setValue("SimplifySpectrumUserPropertieskey2", "SimplifySpectrumUserPropertiesvalue2");
+
+        // add to array
+        unsigned int idx = properties.size();
+        unsigned int num = props.getNumberOfProperties();
+        if( num > 0 ) {
+            // resize
+            properties.resize( idx + num );
+
+            // set value
+            for( unsigned int j = 0; j < num; j++ ) {
+                Prop& prop = properties[ idx + j ];
+                prop.id = id;
+                prop.key = st( props.getKey( j ) );
+                prop.value = st( props.getValue( j ) );
+            }
+        }
+    }
+
+    // spectrum user property data size
+    unsigned int dataSize = GET_DATA_SIZE( m_prop );
+
+    // header
+    m_dataHeader[ 0 ].val.ul = GET_DATA_SIZE( m_dataHeader );	// header size
+    m_dataHeader[ 1 ].val.ul = dataSize;						 // spectrum user property size
+    m_dataHeader[ 2 ].val.ul = properties.size();				// number of spectrum user properties
+
+    // write header
+    WRITE_TO_FILE( m_dataHeader );
+    if( properties.size() == 0 ) {
+        return;
+    }
+
+    // buffer
+    unsigned int size = dataSize * properties.size();
+    unsigned char* buff = new unsigned char[ size ];
+    unsigned char* pos = buff;
+
+    // write to buffer
+    for( unsigned int i = 0; i < properties.size(); i++ ) {
+        // property
+        Prop& prop = properties[ i ];
+
+        // set data
+        m_prop[ 0 ].val.ul = prop.id;	   // Spectrum ID
+        m_prop[ 1 ].val.ms = prop.key;	  // Property Key
+        m_prop[ 2 ].val.ms = prop.value;	// Property Value
+
+        // write to header
+        WRITE_TO_BUFFER( m_prop, pos );
+        pos += dataSize;
+    }
+
+    // write to file
+    size_t stReturnValue = fwrite( buff, 1, size, m_fp );	// @date 2013/06/27 <Mod> OKADA
+    if( stReturnValue != size ){							// @date 2013/06/27 <Add> OKADA
+        LOG_ERROR( FMT( "Writing MSB file error in writeSpectrumUserProperties(). Return value and item size of fwrite() disagree. Return value=%d, Item size=%d. errno=%d", stReturnValue, size, errno ) );	// @date 2013/06/27 <Add> OKADA
+    }														// @date 2013/06/27 <Add> OKADA
+
+    // delete buffer
+    delete[] buff;
 }
 
 // write specrum user property
@@ -1882,6 +2258,7 @@ bool MsbIO0202::onWriteMsb(
 	std::map< kome::objects::Chromatogram*, unsigned int > chromatogramMap;
 	std::vector< ChromatogramDataInfo > chromData;
 
+    //make theNumberOfChromatograms() returns zero. There is no Chromatograms data.
 	for( unsigned int i = 0; i < dataSet.getNumberOfChromatograms() && !progress.isStopped(); i++ ) {
 		// chromatogram
 		kome::objects::Chromatogram* chromatogram = dataSet.getChromatogram( i );
@@ -1916,7 +2293,7 @@ bool MsbIO0202::onWriteMsb(
     m_fileHeader[ 14 ].val.ull = filetell( m_fp );					  // 14 : Chromatograms Align
 	progress.setStatus( "Writing chromatogram information." );
 
-	writeChromatograms( chromData, chromatogramMap, groupMap );
+    writeChromatograms( chromData, chromatogramMap, groupMap );//write m_chromatogramInfo to m_fp
 	progress.setPosition( ++pos );	// pos == 5 + chromatograms
 
 	// chromatogram property
@@ -1955,7 +2332,7 @@ bool MsbIO0202::onWriteMsb(
 
 	kome::core::DataPoints tmpPts;
 	std::map< kome::objects::Spectrum*, unsigned int > spectrumMap;
-
+    //our data storged in here.
 	for( unsigned int i = 0; i < dataSet.getNumberOfSpectra() &&  !progress.isStopped(); i++ ) {
 		// spectrum
 		kome::objects::Spectrum* spectrum = dataSet.getSpectrum( i );
@@ -1985,7 +2362,7 @@ bool MsbIO0202::onWriteMsb(
 			}
 		}
 
-        // write spectrum data to partsFp
+        // write spectrum data to m_fp, m_partInfo to partsFp.
 		partsCnt += writeSpectrumData( id, *spectrum, points, partsFp );
 		progress.setPosition( ++pos );	// pos == 7 + chromatograms + spectra
 
@@ -2015,7 +2392,7 @@ bool MsbIO0202::onWriteMsb(
 	progress.setStatus( "Writing spectrum parts." );
 
     partsFp = fileopen( partsPath.c_str(), "rb" );//以二进制形式打开，read模式。
-    writeSpectrumParts( partsCnt, partsFp ); //move data from partsFp to m_fp. LY
+    writeSpectrumParts( partsCnt, partsFp ); //move m_partInfo from partsFp to m_fp. LY
 	fclose( partsFp );
 	progress.setPosition( ++pos );	// pos == 9 + chromatograms + spectra
 
@@ -2063,4 +2440,153 @@ bool MsbIO0202::onWriteMsb(
 	progress.setPosition( ++pos );	// pos == 13 + chromatograms + spectra
 
 	return true;
+}
+
+bool MsbIO0202::onSimplifyWriteMsb(){
+    // log
+    LOG_INFO( FMT( "Writing MSB format sample. [ver 2.2]" ) )
+
+    std::vector< kome::objects::DataGroupNode* > groups;
+//    getGroups( dataSet, groups );
+
+    // file header
+    m_fileHeader[ 0 ].val.ul = GET_DATA_SIZE( m_fileHeader );				     // Header Size
+    m_fileHeader[ 1 ].val.uc = m_bigendian ? 0 : 1;							     // Endian
+    m_fileHeader[ 4 ].val.ms = st( "sample.getSampleSet()->getFilePath()" );	 // File Path
+    m_fileHeader[ 5 ].val.ms = st( "sample.getName()" );						 // Sample Name
+    m_fileHeader[ 6 ].val.ms = st( "sample.getInstrument()" );			     	 // Instrument Name
+    m_fileHeader[ 7 ].val.ms = st( "sample.getMsCompany()" );					 // manufacture
+    m_fileHeader[ 8 ].val.ms = st( "sample.getSoftwareName()" );				 // software name
+    m_fileHeader[ 9 ].val.ms = st( "sample.getSoftwareVersion()" );			     // software version
+    m_fileHeader[ 22 ].val.t = time( nullptr );								     // Time
+
+    WRITE_TO_FILE( m_fileHeader );
+
+    // spectrum group
+    m_fileHeader[ 10 ].val.ull = filetell( m_fp );			 // 10: Spectrum Group Align
+
+    std::map< kome::objects::DataGroupNode*, unsigned int > groupMap;
+//    groupMap[ sample.getRootDataGroupNode() ] = 0;
+
+    writeDataGroupNodes( groups, groupMap );
+//    groups.push_back( sample.getRootDataGroupNode() );
+
+    // spectrum group properties
+    m_fileHeader[ 11 ].val.ull = filetell( m_fp );           // 11: Spectrum Group Properties Align
+
+    writeDataGroupNodeProperties( groups, groupMap );
+
+    m_fileHeader[ 12 ].val.ull = filetell( m_fp );          // 12: Spectrum Group User Properties Align
+    writeDataGroupNodeUserProperties( groups, groupMap );
+
+    groups.clear();
+
+    // chromatogram data
+    m_fileHeader[ 13 ].val.ull = filetell( m_fp );          // 13: Chromatogram Data Align
+
+    kome::core::DataPoints points( kome::core::DataPoints::FLOAT );
+    std::map< kome::objects::Chromatogram*, unsigned int > chromatogramMap;
+    std::vector< ChromatogramDataInfo > chromData;
+
+    // chromatograms
+    m_fileHeader[ 14 ].val.ull = filetell( m_fp );				 // 14 : Chromatograms Align
+    writeChromatograms( chromData, chromatogramMap, groupMap );  //write m_chromatogramInfo to m_fp
+
+    // chromatogram property
+    m_fileHeader[ 15 ].val.ull = filetell( m_fp );		 		 // 15 : Chromatogram Properties Align
+
+    kome::objects::DataSet* tmp_dataSet = nullptr;
+    writeChromatogramProperties( *tmp_dataSet, chromatogramMap );
+
+    // chromatogram user property
+    m_fileHeader[ 16 ].val.ull = filetell( m_fp );					 // 16 : Chromatogram User Properties Align
+    writeChromatogramUserProperties( *tmp_dataSet, chromatogramMap );
+
+    // spectrum data
+    m_fileHeader[ 17 ].val.ull = filetell( m_fp );                  // 17: Spectrum Data Align
+
+    kome::core::MsppManager& msppMgr = kome::core::MsppManager::getInstance();
+    std::string fileName = msppMgr.getTmpFileName( "mspp_spec_parts", ".tmp" );
+    std::string partsPath = getpath( msppMgr.getTmpDir(), fileName.c_str() );
+    FILE* partsFp = fileopen( partsPath.c_str(), "wb" ); //以二进制形式打开，write模式。
+
+    int partsCnt = 0;
+
+    kome::core::DataPoints tmpPts;
+    std::map< kome::objects::Spectrum*, unsigned int > spectrumMap;
+    //our data storged in here.
+    unsigned int frameCnt = 10;
+    for( unsigned int i = 0; i < frameCnt; i++ ) {
+        float minX = -1.0, maxX = -1.0;
+        int length = 100;//每帧数据长度
+        // create array
+//        float* mzArray = new float[ length ];
+//        float* intArray = new float[ length ];
+        std::vector<float> mzArray(length, i);
+        std::vector<float> intArray(length, i);
+
+        // add
+        tmpPts.reserve( length );
+        for( unsigned int i = 0; i < length; i++ ) {
+            // x, y
+            double x = (double)mzArray[ i ];
+            double y = (double)intArray[ i ];
+
+            // add
+            if( ( minX < 0.0 || x >= minX ) && ( maxX < 0.0 || x <= maxX ) ) {
+                tmpPts.addPoint( x, y );
+            }
+        }
+        // delete array
+//        delete[] mzArray;
+//        delete[] intArray;
+
+        // ID
+        unsigned int id = ( i + 1 );
+//        spectrumMap[ spectrum ] = id;
+
+        // write spectrum data to m_fp, and write m_partInfo to  partsFp.
+//        partsCnt += writeSpectrumData( id, nullptr/**spectrum*/, tmpPts, partsFp );
+        partsCnt += writeSimplifySpectrumData( id, tmpPts, partsFp );
+        // clear points
+        tmpPts.clearPoints();
+        points.clearPoints();
+    }
+    fflush( partsFp );
+    fclose( partsFp );
+
+    // spectra
+    m_fileHeader[ 18 ].val.ull = filetell( m_fp );					  // 18: Spectrum Align
+//    writeSpectra( dataSet, spectrumMap, groupMap ); //write m_spectrumInfo to m_fp.
+    writeSimplifySpectra( frameCnt ); //write m_spectrumInfo to m_fp. LYYYYY
+
+    // spectrum part
+    m_fileHeader[ 19 ].val.ull = filetell( m_fp );					  // 19: Spectrum Part Align
+
+    partsFp = fileopen( partsPath.c_str(), "rb" );//以二进制形式打开，read模式。
+    writeSpectrumParts( partsCnt, partsFp ); //move data from partsFp to m_fp. LY
+    fclose( partsFp );
+
+
+    // spectrum property
+
+    m_fileHeader[ 20 ].val.ull = filetell( m_fp );					 // Spectrum Property Align
+//    writeSpectrumProperties( dataSet, spectrumMap );
+    writeSimplifySpectrumProperties( frameCnt );
+
+    // spectrum user property
+    m_fileHeader[ 21 ].val.ull = filetell( m_fp );					 // Spectrum User Property Align
+
+//    writeSpectrumUserProperties( dataSet, spectrumMap );
+    writeSimplifySpectrumUserProperties( frameCnt );
+
+    // string table
+    m_fileHeader[ 22 ].val.ull = filetell( m_fp );					 // String Table Align
+    m_fileHeader[ 23 ].val.ul = writeStringTable();				     // Compressed string table seize
+    m_fileHeader[ 24 ].val.ul = m_stringTable.size();				 // Uncompressed String Table Size
+    m_stringTable.clear();
+
+    fileseek( m_fp, 0, SEEK_SET );
+    WRITE_TO_FILE( m_fileHeader );
+    return true;
 }

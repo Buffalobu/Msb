@@ -183,6 +183,26 @@ bool MsbManager::writeMsb(
 	return ret;
 }
 
+bool MsbManager::SimplifyWriteMsb(
+        const char* path){
+    // open
+    m_fp = fopen( path, "wb" );
+    if( m_fp == nullptr ) {
+        LOG_ERROR_CODE( FMT( "Failed to open the sample for writing. Check file / folder permissions. [%s]", NVL( path, "" ) ), ERR_FILE_OPEN_FAILED );
+        return false;
+    }
+
+    bool ret = onSimplifyWriteMsb();
+
+    // close
+    fflush( m_fp );
+    fclose( m_fp );
+    m_fp = nullptr;
+
+    return ret;
+
+}
+
 // close file
 void MsbManager::closeFile() {
     if( m_fp != nullptr ) {

@@ -16,7 +16,7 @@
 #include <string>
 #include <vector>
 #include <utility>
-//#include <boost/function.hpp>
+#include <boost/function.hpp>
 
 
 namespace kome {

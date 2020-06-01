@@ -332,6 +332,13 @@ namespace kome {
 					std::map< kome::objects::Chromatogram*, unsigned int >& chromatogramMap
 				);
 
+                // write Simplify spectrum data
+                int writeSimplifySpectrumData(
+                        unsigned int id,
+                        kome::core::DataPoints& points,
+                        FILE* partsFp
+                );
+
 				/**
 				 * @fn int writeSpectrumData(
 						unsigned int id,
@@ -352,6 +359,20 @@ namespace kome {
 					kome::core::DataPoints& points,
 					FILE* partsFp
 				);
+
+                /** LUOYONG
+                 * @fn void writeSimplifySpectra(
+                        kome::objects::DataSet& dataSet,
+                        std::map< kome::objects::Spectrum*, unsigned int >& spectrumMap,
+                        std::map< kome::objects::DataGroupNode*, unsigned int >& groupMap
+                    )
+                 * @brief writes spectrum information
+                 * @param spectra spectra information
+                 * @param spectrumMap spectrum ID map
+                 * @param groupMap spectrum group ID map
+                 */
+                void writeSimplifySpectra(unsigned int frameCnt
+                );
 
 				/**
 				 * @fn void writeSpectra(
@@ -378,6 +399,16 @@ namespace kome {
 				 */
 				void writeSpectrumParts( const int cnt, FILE* partsFp );
 
+                /**
+                 * @fn void writeSimplifySpectrumProperties(
+                        unsigned int frameCnt
+                    )
+                 * @brief writes spectrum property information
+                 * @param unsigned int frameCnt
+                 * @param unsigned int frameCnt
+                 */
+                void writeSimplifySpectrumProperties(unsigned int frameCnt);
+
 				/**
 				 * @fn void writeSpectrumProperties(
 						kome::objects::DataSet& dataSet,
@@ -391,6 +422,16 @@ namespace kome {
 					kome::objects::DataSet& dataSet,
 					std::map< kome::objects::Spectrum*, unsigned int >& spectrumMap
 				);
+
+                /**
+                 * @fn void writeSimplifySpectrumUserProperties(
+                        unsigned int frameCnt
+                    )
+                 * @brief writes spectrum user property information
+                 * @param spectra spectrum array
+                 * @param spectrumMap spectrum ID map
+                 */
+                void writeSimplifySpectrumUserProperties(unsigned int frameCnt);
 
 				/**
 				 * @fn void writeSpectrumUserProperties(
@@ -441,6 +482,12 @@ namespace kome {
                     bool op ,
 					kome::core::Progress& progress
 				);
+
+                /* 只写谱图数据。
+                 *
+                 *
+                 */
+                virtual bool onSimplifyWriteMsb();
 			};
 		}
 	}

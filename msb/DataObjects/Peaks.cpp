@@ -243,7 +243,7 @@ void Peaks::calcArea() {
 	// import
 	kome::core::DataPoints dps( kome::core::DataPoints::FLOAT );
 	kome::core::FileAccessor acc( fp );
-//	dps.importData( boost::bind( &kome::core::FileAccessor::read, &acc, _1, _2 ) );
+    dps.importData( boost::bind( &kome::core::FileAccessor::read, &acc, _1, _2 ) );
 	fclose( fp );
 	if( dps.getLength() < 2 ) {
 		return;
@@ -341,9 +341,9 @@ void Peaks::setDataPoints( kome::core::XYData& xyData ) {
 	}
 
 	// save data
-//	kome::core::FileAccessor acc( fp );
+    kome::core::FileAccessor acc( fp );
 //    dps.exportData();
-//	dps.exportData( boost::bind( &kome::core::FileAccessor::write, &acc, _1, _2 ) );
+    dps.exportData( boost::bind( &kome::core::FileAccessor::write, &acc, _1, _2 ) );
 
 	fclose( fp );
 }
@@ -427,7 +427,8 @@ void Peaks::arrangePeaks() {
 }
 
 // on load file
-bool Peaks::onLoadData(int (*readFun)(void *, int) ) {
+bool Peaks::onLoadData( boost::function< int ( void*, int ) > readFun ){
+//bool Peaks::onLoadData(int (*readFun)(void *, int) ) {
 	// length
 	unsigned long len = 0;
 	readFun( &len, sizeof( len ) );
@@ -474,8 +475,8 @@ bool Peaks::onLoadData(int (*readFun)(void *, int) ) {
 }
 
 // on write file
-//bool Peaks::onSaveData( boost::function< int ( void*, int ) > writeFun ) {
-bool Peaks::onSaveData( int(*writeFun) ( void*, int )) {
+bool Peaks::onSaveData( boost::function< int ( void*, int ) > writeFun ) {
+//bool Peaks::onSaveData( int(*writeFun) ( void*, int )) {
 	// length
 	unsigned long len = m_peaks.size();
 	writeFun( &len, sizeof( len ) );

@@ -21,8 +21,8 @@
 #include <math.h>
 
 #include <list>
-//#include <boost/function.hpp>
-//#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 // @data 2011.03.02 <Add> M.Aihara ->
 // add TBB mutex code

@@ -14,7 +14,7 @@
 
 #include <float.h>
 #include <limits.h>
-//#include <boost/bind.hpp>
+#include <boost/bind.hpp>
 
 
 using namespace kome::core;

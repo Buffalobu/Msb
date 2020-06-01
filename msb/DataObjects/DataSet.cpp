@@ -188,7 +188,7 @@ void DataSet::removeSpectrum( Spectrum* spec ) {
 // insert spectrum
 void DataSet::insertSpectrum( Spectrum* spec, const int idx ) {
 	// check the parameter
-        if( spec == nullptr ) {
+    if( spec == nullptr ) {
 		return;
 	}
 

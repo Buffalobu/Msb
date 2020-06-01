@@ -28,7 +28,7 @@
 #include <math.h>
 #include <stdio.h>
 #include <algorithm>
-//#include <boost/bind.hpp>
+#include <boost/bind.hpp>
 
 // @date 2011.03.02 <Add> M.Aihara ->
 // add TBB mutex code

@@ -28,7 +28,7 @@
 
 //#include "../CoreFunctions/CoreMacros.h" //ly
 //#include "../CoreFunctions/StringFunctions.h" //ly
-//#include <boost/filesystem.hpp>  //ly
+#include <boost/filesystem.hpp>  //ly
 
 namespace kome {
 	namespace core {

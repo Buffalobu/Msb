@@ -211,6 +211,20 @@ namespace kome {
 						kome::core::Progress& progress
 				);
 
+                /**
+                 * @fn bool SimplifyWriteMsb(
+                            const char* path
+                    )
+                 * @brief writes Simplify Msb file. Only Spectrums(no Chromatogram)
+                 * @param path file path
+                 * @param
+                 * @param
+                 * @param
+                 * @return If it succeeded to save the file, this method returns true.
+                 */
+                bool SimplifyWriteMsb(
+                        const char* path);
+
 				/**
 				 * @fn void closeFile()
 				 * @brief close file
@@ -456,6 +470,24 @@ namespace kome {
 					bool op,
 					kome::core::Progress& progress
 				) = 0;
+
+                /**
+                 * @fn virtual bool onSimplifyWriteMsb(
+                        kome::objects::Sample& sample,
+                        kome::objects::DataSet& dataSet,
+                        bool op,
+                        kome::core::Progress& progress
+                    ) = 0
+                 * @brief This method is called by writeMsb method. (abstract method)
+                 * @param sample sample
+                 * @param spectra spectrum informations to save
+                 * @param op If true, writing operated spectrum data
+                 * @param progress progress object
+                 * @return If it succeeded to save file, this method returns true.
+                 */
+                virtual bool onSimplifyWriteMsb(
+
+                ) = 0;
 			};
 		}
 	}

@@ -42,8 +42,8 @@ namespace kome {
 			 * @brief constructor
 			 * @param[in] lessFun compare function
 			 */
-//            Heap( boost::function< bool( T&, T& ) > lessFun ) {
-            Heap( bool(*lessFun)( T&, T& )) {
+            Heap( boost::function< bool( T&, T& ) > lessFun ) {
+//            Heap( bool(*lessFun)( T&, T& )) {
                                 m_arr = nullptr;
 				m_size = 0;
 				m_arrSize = 0;
@@ -69,8 +69,8 @@ namespace kome {
 			unsigned int m_arrSize;
 
 			/** compare function */
-//			boost::function< bool( T&, T& ) > m_less;
-            bool(*m_less)( T&, T& );
+            boost::function< bool( T&, T& ) > m_less;
+//            bool(*m_less)( T&, T& );
 
 		public:
 			/**

@@ -15,8 +15,8 @@
 
 #include <vector>
 
-//#include <boost/function.hpp>
-//#include <boost/bind.hpp>
+#include <boost/function.hpp>
+#include <boost/bind.hpp>
 
 #include <algorithm>
 
@@ -146,8 +146,8 @@ namespace kome {
 				  If the node specified by the first parameter sorts before the node specified by second parameter,
 				  this function returns true
              */
-//            void sortChildren( boost::function< bool ( TreeNode<T>&, TreeNode<T>& ) > lessFun ) {
-            void sortChildren( bool(*lessFun) ( TreeNode<T>&, TreeNode<T>& )) {
+            void sortChildren( boost::function< bool ( TreeNode<T>&, TreeNode<T>& ) > lessFun ) {
+//            void sortChildren( bool(*lessFun) ( TreeNode<T>&, TreeNode<T>& )) {
 				// check member
 				if( m_children.size() == 0 ) {
 					return;

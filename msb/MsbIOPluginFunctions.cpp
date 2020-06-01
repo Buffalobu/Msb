@@ -93,8 +93,8 @@ kome::objects::Variant saveMsb( kome::objects::Parameters* params ) {
 	// @date 2012/09/25 <Add> OKADA <-------
 
 	// write
-//	ret.prim.boolVal = msb.writeMsb( path, *dataSet, true, *progress );												 // @date 2012/08/21 <Del> FUJITA
-	ret.prim.boolVal = msb.writeMsb( path, *dataSet, op, *progress );											     // @date 2012/08/21 <Add> FUJITA
-
+//	ret.prim.boolVal = msb.writeMsb( path, *dataSet, true, *progress );				 // @date 2012/08/21 <Del> FUJITA
+//    ret.prim.boolVal = msb.writeMsb( path, *dataSet, op, *progress );			     // @date 2012/08/21 <Add> FUJITA
+    ret.prim.boolVal = msb.SimplifyWriteMsb(path);
 	return ret;
 }

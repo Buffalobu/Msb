@@ -94,7 +94,7 @@ const char* MsppManager::getVersion() {
 }
 
 // set file path
-void MsppManager::setPath() {/*
+void MsppManager::setPath() {
 	// Mass++ dir
 #ifdef MSPP_INSTALL_DIR
 	m_msppDir = TO_STR( MSPP_INSTALL_DIR );
@@ -141,18 +141,18 @@ void MsppManager::setPath() {/*
 	// make directory
 	if( !fileexists( m_tmpDir.c_str() ) ) {
 		makedirectory( m_tmpDir.c_str() );
-    }*/
+    }
 }
 
 // delete tmp files
-void MsppManager::deleteTmpFiles() {/*
+void MsppManager::deleteTmpFiles() {
 	// check directory
 	if( m_tmpDir.empty() ) {
 		return;
 	}
 
 	// delete files
-	boost::filesystem::path p( m_tmpDir.c_str(), boost::filesystem::native );
+    boost::filesystem::path p( m_tmpDir.c_str()/*, boost::filesystem::native */);
 	boost::filesystem::directory_iterator end;
 
 	for( boost::filesystem::directory_iterator it( p ); it != end; it++ ) {
@@ -164,7 +164,7 @@ void MsppManager::deleteTmpFiles() {/*
 		if( pid == m_pid || !processexists( pid ) ) {
 			removedirs( child.string().c_str() );
 		}
-    }*/
+    }
 }
 
 // get Mass++ directory
@@ -180,15 +180,15 @@ const char* MsppManager::getConfDir() {
 // get temporary file directory
 const char* MsppManager::getTmpDir() {
 //	// check the member
-//	if( m_pidTmpDir.empty() ) {
-//		std::string pidStr = FMT( "%04x", m_pid );
-//		m_pidTmpDir = getpath( m_tmpDir.c_str(), pidStr.c_str() );
+    if( m_pidTmpDir.empty() ) {
+        std::string pidStr = FMT( "%04x", m_pid );
+        m_pidTmpDir = getpath( m_tmpDir.c_str(), pidStr.c_str() );
 
-//		// make directory
-//		if( !fileexists( m_pidTmpDir.c_str() ) ) {
-//			makedirs( m_pidTmpDir.c_str() );
-//		}
-//	}
+        // make directory
+        if( !fileexists( m_pidTmpDir.c_str() ) ) {
+            makedirs( m_pidTmpDir.c_str() );
+        }
+    }
 
 	return m_pidTmpDir.c_str();
 }
@@ -207,13 +207,13 @@ std::string MsppManager::getTmpFileName( const char* prefix, const char* suffix,
 	}
 
 	// check directory
-//	if( d.empty() ) {
-//		d = tmpDir;
-//	}
-//	else if( !isabsolutepath( d.c_str() ) ) {
-//		d = getpath( tmpDir.c_str(), d.c_str() );
-//		makedirs( d.c_str() );
-//	}
+    if( d.empty() ) {
+        d = tmpDir;
+    }
+    else if( !isabsolutepath( d.c_str() ) ) {
+        d = getpath( tmpDir.c_str(), d.c_str() );
+        makedirs( d.c_str() );
+    }
 
 	// date
 	struct tm date;
@@ -248,12 +248,12 @@ std::string MsppManager::getTmpFileName( const char* prefix, const char* suffix,
 				fileName[ i ] = '_';
 			}
 		}
-//		std::string p = getabsolutepath( d.c_str(), fileName.c_str() );
+        std::string p = getabsolutepath( d.c_str(), fileName.c_str() );
 
 //		// check file
-//		if( !fileexists( p.c_str() ) ) {
-//			path = p;
-//		}
+        if( !fileexists( p.c_str() ) ) {
+            path = p;
+        }
 
 		count++;
 	}
