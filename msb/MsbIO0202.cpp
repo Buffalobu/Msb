@@ -1152,30 +1152,30 @@ void MsbIO0202::writeChromatogramProperties(
 	// get properties
 	std::vector< Prop > properties;
 
-	for( unsigned i = 0; i < dataSet.getNumberOfChromatograms(); i++ ) {
-		// chromatogram
-		kome::objects::Chromatogram* chrom = dataSet.getChromatogram( i );
-		unsigned int id = chromatogramMap[ chrom ];
+//	for( unsigned i = 0; i < dataSet.getNumberOfChromatograms(); i++ ) {
+//		// chromatogram
+//		kome::objects::Chromatogram* chrom = dataSet.getChromatogram( i );
+//		unsigned int id = chromatogramMap[ chrom ];
 
-		// property
-		kome::core::Properties& props = chrom->getProperties();
+//		// property
+//		kome::core::Properties& props = chrom->getProperties();
 
-		// add to array
-		unsigned int idx = properties.size();
-		unsigned int num = props.getNumberOfProperties();
-		if( num > 0 ) {
-			// resize
-			properties.resize( idx + num );
+//		// add to array
+//		unsigned int idx = properties.size();
+//		unsigned int num = props.getNumberOfProperties();
+//		if( num > 0 ) {
+//			// resize
+//			properties.resize( idx + num );
 
-			// set value
-			for( unsigned int j = 0; j < num; j++ ) {
-				Prop& prop = properties[ idx + j ];
-				prop.id = id;
-				prop.key = st( props.getKey( j ) );
-				prop.value = st( props.getValue( j ) );
-			}
-		}
-	}
+//			// set value
+//			for( unsigned int j = 0; j < num; j++ ) {
+//				Prop& prop = properties[ idx + j ];
+//				prop.id = id;
+//				prop.key = st( props.getKey( j ) );
+//				prop.value = st( props.getValue( j ) );
+//			}
+//		}
+//	}
 
 	// chromatogram property data size
 	unsigned int dataSize = GET_DATA_SIZE( m_prop );
@@ -1183,7 +1183,7 @@ void MsbIO0202::writeChromatogramProperties(
 	// header
 	m_dataHeader[ 0 ].val.ul = GET_DATA_SIZE( m_dataHeader );	// header size
 	m_dataHeader[ 1 ].val.ul = dataSize;						 // spectrum property size
-	m_dataHeader[ 2 ].val.ul = properties.size();				// number of spectrum properties
+    m_dataHeader[ 2 ].val.ul = 0/*properties.size()*/;				// number of spectrum properties
 
 	// write header
 	WRITE_TO_FILE( m_dataHeader );
@@ -1229,30 +1229,30 @@ void MsbIO0202::writeChromatogramUserProperties(
 	// get properties
 	std::vector< Prop > properties;
 
-	for( unsigned i = 0; i < dataSet.getNumberOfChromatograms(); i++ ) {
-		// chromatogram
-		kome::objects::Chromatogram* chrom = dataSet.getChromatogram( i );
-		unsigned int id = chromatogramMap[ chrom ];
+//	for( unsigned i = 0; i < dataSet.getNumberOfChromatograms(); i++ ) {
+//		// chromatogram
+//		kome::objects::Chromatogram* chrom = dataSet.getChromatogram( i );
+//		unsigned int id = chromatogramMap[ chrom ];
 
-		// property
-		kome::core::Properties& props = chrom->getUserProperties();
+//		// property
+//		kome::core::Properties& props = chrom->getUserProperties();
 
-		// add to array
-		unsigned int idx = properties.size();
-		unsigned int num = props.getNumberOfProperties();
-		if( num > 0 ) {
-			// resize
-			properties.resize( idx + num );
+//		// add to array
+//		unsigned int idx = properties.size();
+//		unsigned int num = props.getNumberOfProperties();
+//		if( num > 0 ) {
+//			// resize
+//			properties.resize( idx + num );
 
-			// set value
-			for( unsigned int j = 0; j < num; j++ ) {
-				Prop& prop = properties[ idx + j ];
-				prop.id = id;
-				prop.key = st( props.getKey( j ) );
-				prop.value = st( props.getValue( j ) );
-			}
-		}
-	}
+//			// set value
+//			for( unsigned int j = 0; j < num; j++ ) {
+//				Prop& prop = properties[ idx + j ];
+//				prop.id = id;
+//				prop.key = st( props.getKey( j ) );
+//				prop.value = st( props.getValue( j ) );
+//			}
+//		}
+//	}
 
 	// chromatogram user property data size
 	unsigned int dataSize = GET_DATA_SIZE( m_prop );
@@ -1260,7 +1260,7 @@ void MsbIO0202::writeChromatogramUserProperties(
 	// header
 	m_dataHeader[ 0 ].val.ul = GET_DATA_SIZE( m_dataHeader );	// header size
 	m_dataHeader[ 1 ].val.ul = dataSize;						 // chromatogram user property size
-	m_dataHeader[ 2 ].val.ul = properties.size();				// number of chromatogram user properties
+    m_dataHeader[ 2 ].val.ul = 0/*properties.size()*/;				// number of chromatogram user properties
 
 	// write header
 	WRITE_TO_FILE( m_dataHeader );
@@ -2506,7 +2506,7 @@ bool MsbIO0202::onSimplifyWriteMsb(){
     m_fileHeader[ 17 ].val.ull = filetell( m_fp );                  // 17: Spectrum Data Align
 
     kome::core::MsppManager& msppMgr = kome::core::MsppManager::getInstance();
-    std::string fileName = msppMgr.getTmpFileName( "mspp_spec_parts", ".tmp" );
+    std::string fileName = msppMgr.getTmpFileName( "mspp_spec_parts", ".tmp", "G:\\QT\\qt_msb_test" );
     std::string partsPath = getpath( msppMgr.getTmpDir(), fileName.c_str() );
     FILE* partsFp = fileopen( partsPath.c_str(), "wb" ); //以二进制形式打开，write模式。
 

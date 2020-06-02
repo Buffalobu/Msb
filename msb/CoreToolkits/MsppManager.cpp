@@ -99,7 +99,8 @@ void MsppManager::setPath() {
 #ifdef MSPP_INSTALL_DIR
 	m_msppDir = TO_STR( MSPP_INSTALL_DIR );
 #else
-	std::string moduleDir = getmoduledir();
+//	std::string moduleDir = getmoduledir();
+    std::string moduleDir = "G:\\QT\\qt_msb_test";
 	m_msppDir = getabsolutepath( moduleDir.c_str(), ".." );
 #endif  // MSPP_INSTALL_DIR
 

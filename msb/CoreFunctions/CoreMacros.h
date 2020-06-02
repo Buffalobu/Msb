@@ -29,7 +29,10 @@
 /** get min value */
 #define MIN( x, y )		 ( ( ( x ) > ( y ) ) ? ( y ) : ( x ) )
 
-/** If x is greater than high, the value is high.
+/* * clamp  clamp clamp clamp clamp
+ * v.	(用夹具) 夹紧，夹住，固定; 紧紧抓住; 紧夹住; 被抓住; 被夹紧; 用夹锁锁住(车);
+ * n.	夹具; 夹子; 夹钳; 车轮夹锁(用于锁住违章停放的车辆);
+ * If x is greater than high, the value is high.
 	If x is less than low, the value is low.
 	Bisides the value is x. */
 #define CLAMP( x, low, high )   MIN( high, MAX( x, low ) )

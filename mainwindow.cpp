@@ -53,7 +53,7 @@ void MainWindow::on_UI_PB_Convert_clicked()
     kome::objects::Variant ret;
     ret.type = kome::objects::Variant::BOOL;
     kome::io::msb::MsbIO0202 msb0202;
-    std::string path = "G:\\QT\\qt_msb_test\\testMsb.msb";
+    std::string path = "G:\\QT\\qt_msb_test\\testMsb_n_b.msb";
     ret.prim.boolVal = msb0202.SimplifyWriteMsb(path.c_str());
     return;
 

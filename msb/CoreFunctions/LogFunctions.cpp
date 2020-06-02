@@ -26,7 +26,7 @@
 int g_logLevel = LOG_LEVEL_WARN;
 
 /** write log function */
-void (*g_outputLogFun)( const char*, int ) = NULL;
+void (*g_outputLogFun)( const char*, int ) = nullptr;
 
 
 /** error code */
@@ -97,7 +97,7 @@ const char* getlasterrormessage() {
 	g_tmperrorMessage = g_errorMessage;
 
 	// Delete the error message after it has been used.
-	seterrorcode(-1, NULL);
+    seterrorcode(-1, nullptr);
 
 	return g_tmperrorMessage.c_str();
 }
@@ -112,15 +112,15 @@ void outputlog( const char* msg, int level, const char* file, int line ) {
 
 	// create message
 	std::string s = std::string( LOG_HEADERS[ level ] );
-	if( file != NULL ) {
+    if( file != nullptr ) {
 		s += " ";
 		s += getfilename( file );
 	}
 	if( line >= 0 ) {
 		s += strfmt( "(%d)", line );
 	}
-	if( msg != NULL ) {
-		if( file == NULL && line < 0 ) {
+    if( msg != nullptr ) {
+        if( file == nullptr && line < 0 ) {
 			s += strfmt( "%s", msg );
 		}
 		else {
@@ -129,7 +129,7 @@ void outputlog( const char* msg, int level, const char* file, int line ) {
 	}
 
 	// output log
-	if( g_outputLogFun != NULL ) {
+    if( g_outputLogFun != nullptr ) {
 		(*g_outputLogFun)( s.c_str(), level );
 	}
 
@@ -146,7 +146,7 @@ void outputlog( const char* msg, int level, const char* file, int line ) {
 void seterrorcode( int code, const char* msg ) {
 	g_errorCode = code;
 
-	if( msg == NULL ) {
+    if( msg == nullptr ) {
 		g_errorMessage.clear();
 	}
 	else {

@@ -54,7 +54,8 @@ std::string strfmt( const char* fmt, ... ) {
 	vsprintf_s( s, STRING_BUFFER_SIZE, fmt, ap );
 
 #else
-    //vasprintf( &s, fmt, ap ); //ly
+//    vasprintf( &s, fmt, ap ); //ly
+    s = (char*)malloc( 100 );
     vsprintf( s, fmt, ap );
 
 #endif	// _MSC_VER

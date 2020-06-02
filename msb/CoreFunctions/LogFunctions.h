@@ -33,12 +33,12 @@
 		}												   \
 	}
 
-	#define LOG_FATAL_CODE( msg, code )	logfatalcode( code, msg.c_str(), __FILE__, __LINE__ )
-	#define LOG_ERROR_CODE( msg, code )	logerrorcode( code, msg.c_str(), __FILE__, __LINE__ )
+    #define LOG_FATAL_CODE( msg, code )	 logfatalcode( code, msg.c_str(), __FILE__, __LINE__ )
+    #define LOG_ERROR_CODE( msg, code )	 logerrorcode( code, msg.c_str(), __FILE__, __LINE__ )
 	#define LOG_WARN_CODE( msg, code )	 logwarncode( code, msg.c_str(), __FILE__, __LINE__ )
 	#define LOG_INFO_CODE( msg, code )	 loginfocode( code, msg.c_str(), __FILE__, __LINE__ )
-	#define LOG_DEBUG_CODE( msg, code )	logdebugcode( code, msg.c_str(), __FILE__, __LINE__ )
-	#define LOG_TRACE_CODE( msg, code )	logtracecode( code, msg.c_str(), __FILE__, __LINE__ )
+    #define LOG_DEBUG_CODE( msg, code )	 logdebugcode( code, msg.c_str(), __FILE__, __LINE__ )
+    #define LOG_TRACE_CODE( msg, code )	 logtracecode( code, msg.c_str(), __FILE__, __LINE__ )
 #else
 	#define OUTPUT_LOG( msg, level )	{				   \
 		if( level <= getloglevel() ) {					  \
@@ -46,18 +46,18 @@
 		}												   \
 	}
 
-    #define LOG_FATAL_CODE( msg, code )	logfatalcode( code, msg.c_str(), nullptr, -1 )
-    #define LOG_ERROR_CODE( msg, code )	logerrorcode( code, msg.c_str(), nullptr, -1 )
+    #define LOG_FATAL_CODE( msg, code )	 logfatalcode( code, msg.c_str(), nullptr, -1 )
+    #define LOG_ERROR_CODE( msg, code )	 logerrorcode( code, msg.c_str(), nullptr, -1 )
     #define LOG_WARN_CODE( msg, code )	 logwarncode( code, msg.c_str(), nullptr, -1 )
     #define LOG_INFO_CODE( msg, code )	 loginfocode( code, msg.c_str(), nullptr, -1 )
-    #define LOG_DEBUG_CODE( msg, code )	logdebugcode( code, msg.c_str(), nullptr, -1 )
-    #define LOG_TRACE_CODE( msg, code )	logtracecode( code, msg.c_str(), nullptr, -1 )
+    #define LOG_DEBUG_CODE( msg, code )	 logdebugcode( code, msg.c_str(), nullptr, -1 )
+    #define LOG_TRACE_CODE( msg, code )	 logtracecode( code, msg.c_str(), nullptr, -1 )
 #endif		// _DEBUG
 
 #define LOG_FATAL( msg )			   OUTPUT_LOG( msg.c_str(), LOG_LEVEL_FATAL )
 #define LOG_ERROR( msg )			   OUTPUT_LOG( msg.c_str(), LOG_LEVEL_ERROR )
-#define LOG_WARN( msg )				OUTPUT_LOG( msg.c_str(), LOG_LEVEL_WARN )
-#define LOG_INFO( msg )				OUTPUT_LOG( msg.c_str(), LOG_LEVEL_INFO )
+#define LOG_WARN( msg )			       OUTPUT_LOG( msg.c_str(), LOG_LEVEL_WARN )
+#define LOG_INFO( msg )				   OUTPUT_LOG( msg.c_str(), LOG_LEVEL_INFO )
 #define LOG_DEBUG( msg )			   OUTPUT_LOG( msg.c_str(), LOG_LEVEL_DEBUG )
 #define LOG_TRACE( msg )			   OUTPUT_LOG( msg.c_str(), LOG_LEVEL_TRACE )
 
